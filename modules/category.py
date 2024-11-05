@@ -1,6 +1,8 @@
 import sqlite3
-from PyQt5.QtWidgets import QListWidgetItem, QWidget, QHBoxLayout, QPushButton, QTableWidgetItem, QHeaderView
+from PyQt5.QtWidgets import QDialog, QListWidgetItem, QWidget, QHBoxLayout, QPushButton, QTableWidgetItem, QHeaderView, \
+    QMessageBox
 from PyQt5.QtGui import QIcon
+from PyQt5 import uic
 
 
 class Category:
@@ -9,6 +11,8 @@ class Category:
         self.category_name_input = None
         self.category_list_widget = None
         self.category_table_widget = None
+        self.update_dialog = None  # Dialog for updating category
+        self.category_id_to_update = None  # Store ID of category to update
 
     def set_ui_elements(self, category_name_input, category_list_widget, category_table_widget):
         """Set UI elements so we can interact with them from this class."""
@@ -24,13 +28,15 @@ class Category:
             connection = sqlite3.connect("db/database.db")
             cursor = connection.cursor()
             cursor.execute('''CREATE TABLE IF NOT EXISTS category (
-                                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                name TEXT UNIQUE NOT NULL
+                                catgeory_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                category_name TEXT UNIQUE NOT NULL
                               )''')
 
             try:
-                cursor.execute("INSERT INTO category (name) VALUES (?)", (category_name,))
+                cursor.execute("INSERT INTO category (category_name) VALUES (?)", (category_name,))
                 connection.commit()
+                self.loadCategoryTable()
+                self.loadCategoryList()
                 print("Category saved:", category_name)
             except sqlite3.IntegrityError:
                 print("Category already exists.")
@@ -87,7 +93,7 @@ class Category:
             deleteBtn.setFixedWidth(30)
 
             # Connect buttons to handlers with category ID
-            editBtn.clicked.connect(lambda checked, category_id=category[0]: self.handleEdit(category_id))
+            editBtn.clicked.connect(lambda checked, category_id=category[0]: self.showUpdateDialog(category_id))
             deleteBtn.clicked.connect(lambda checked, category_id=category[0]: self.handleDelete(category_id))
 
             layout.addWidget(editBtn)
@@ -101,13 +107,74 @@ class Category:
             self.category_table_widget.setItem(inx, 1, QTableWidgetItem(str(category[1])))
             self.category_table_widget.setCellWidget(inx, 2, cell_widget)
 
-    def handleEdit(self, category_id):
-        """Handle edit action for a category."""
-        print(f"Edit category with ID: {category_id}")
-        # Implement edit logic
+    def showUpdateDialog(self, category_id):
+        """Display the update dialog and load the selected category's name."""
+        self.category_id_to_update = category_id
+        self.updateDialog = QDialog()
+        uic.loadUi('ui/category_update.ui', self.updateDialog)  # Load the update UI
+
+        # Find and populate the category_update_input field
+        category_name = self.getCategoryName(category_id)
+        self.updateDialog.category_update_input.setText(category_name)
+
+        # Connect the update button
+        self.updateDialog.category_update_btn.clicked.connect(self.updateCategory)
+
+        # Show the dialog
+        self.updateDialog.exec_()
+
+    def getCategoryName(self, category_id):
+        connection = sqlite3.connect("db/database.db")
+        cursor = connection.cursor()
+        cursor.execute("SELECT category_name FROM category WHERE category_id = ?", (category_id,))
+        category_name = cursor.fetchone()[0]
+        connection.close()
+        return category_name
+
+    def updateCategory(self):
+        new_name = self.updateDialog.category_update_input.text()
+        print(new_name)
+
+        if new_name:
+            connection = sqlite3.connect("db/database.db")
+            cursor = connection.cursor()
+            cursor.execute("UPDATE category SET category_name = ? WHERE category_id = ?", (new_name, self.category_id_to_update))
+            connection.commit()
+            connection.close()
+
+            print(f"Category ID {self.category_id_to_update} updated to {new_name}")
+            self.updateDialog.accept()  # Close the dialog
+
+            # Refresh the list and table
+            self.loadCategoryList()
+            self.loadCategoryTable()
+        else:
+            print("New category name is empty.")
+
+    def deleteCategory(self, category_id):
+        """Delete a category from the database by its ID."""
+        connection = sqlite3.connect("db/database.db")
+        cursor = connection.cursor()
+
+        # Confirm deletion
+        cursor.execute("DELETE FROM category WHERE category_id = ?", (category_id,))
+        connection.commit()
+        connection.close()
+        print(f"Category with ID {category_id} deleted.")
 
     def handleDelete(self, category_id):
         """Handle delete action for a category."""
-        print(f"Delete category with ID: {category_id}")
-        # Implement delete logic
- 
+        # Show a confirmation dialog
+        reply = QMessageBox.question(
+            None,
+            "Delete Category",
+            f"Are you sure you want to delete category",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        if reply == QMessageBox.Yes:
+            self.deleteCategory(category_id)
+            # Refresh the list and table after deletion
+            self.loadCategoryList()
+            self.loadCategoryTable()
