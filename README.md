@@ -1,6 +1,6 @@
 # Open Restaurant Software
 
-<img src="icon/logo-red.png" />
+<img src="icon/Logo-red.png" />
 
 Open-source restaurant management software built with Python and Qt, designed to streamline restaurant operations. This application provides a complete suite of features, including Category Management, Item Management, Orders, Tables, and Reports.
 
