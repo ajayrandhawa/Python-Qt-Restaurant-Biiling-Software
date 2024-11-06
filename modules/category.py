@@ -1,6 +1,7 @@
 import sqlite3
-from PyQt5.QtWidgets import QDialog, QListWidgetItem, QWidget, QHBoxLayout, QPushButton, QTableWidgetItem, QHeaderView, \
-    QMessageBox
+
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QDialog, QListWidgetItem, QWidget, QHBoxLayout, QPushButton, QTableWidgetItem, QHeaderView, QMessageBox
 from PyQt5.QtGui import QIcon
 from PyQt5 import uic
 
@@ -77,7 +78,7 @@ class Category:
         self.category_table_widget.setColumnWidth(0, 5)
         self.category_table_widget.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.category_table_widget.verticalHeader().setVisible(False)
-
+        self.category_table_widget.horizontalHeader().setDefaultAlignment(Qt.AlignLeft)
         self.category_table_widget.setRowCount(0)
 
         for inx, category in enumerate(categories):
