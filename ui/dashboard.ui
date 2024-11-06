@@ -34,7 +34,7 @@
     <item>
      <widget class="QStackedWidget" name="uimanager">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="dashboardpage"/>
       <widget class="QWidget" name="itemspage">
@@ -433,6 +433,157 @@ QListWidget::item {
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tablespage">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_8">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="1,10,1">
+            <item>
+             <widget class="QLabel" name="table_label">
+              <property name="font">
+               <font>
+                <pointsize>12</pointsize>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Table Name / No.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="table_name_input">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>25</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLineEdit{
+	padding: 0 10px
+}</string>
+              </property>
+              <property name="frame">
+               <bool>false</bool>
+              </property>
+              <property name="cursorPosition">
+               <number>0</number>
+              </property>
+              <property name="placeholderText">
+               <string>Enter Table Name or Number</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="add_table_btn">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QPushButton{
+	background-color: #FFFFFF;
+	color: #666666;
+}</string>
+              </property>
+              <property name="text">
+               <string>ADD</string>
+              </property>
+              <property name="autoDefault">
+               <bool>false</bool>
+              </property>
+              <property name="default">
+               <bool>true</bool>
+              </property>
+              <property name="flat">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="8,2">
+            <item>
+             <widget class="QListWidget" name="table_list_widget">
+              <property name="styleSheet">
+               <string notr="true">QListWidget {
+	background-color: #ffffff;
+	border: 1px solid #ccc;
+	font-size: 15px;
+	font-weight: bold;
+}
+
+QListWidget::item {
+	width: 100px;
+	height: 100px;
+	white-space: no-wrap;
+	margin: 5px;
+	color: #666666;
+	padding: 10px;
+	background: #E1F8DC;
+	border-radius: 10px;
+
+}</string>
+              </property>
+              <property name="showDropIndicator" stdset="0">
+               <bool>false</bool>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::NoDragDrop</enum>
+              </property>
+              <property name="defaultDropAction">
+               <enum>Qt::IgnoreAction</enum>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>false</bool>
+              </property>
+              <property name="movement">
+               <enum>QListView::Static</enum>
+              </property>
+              <property name="viewMode">
+               <enum>QListView::IconMode</enum>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="sortingEnabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTableWidget" name="table_table_widget"/>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -453,6 +604,7 @@ QListWidget::item {
     <addaction name="actionDashboard"/>
     <addaction name="actionItems"/>
     <addaction name="actionCategory"/>
+    <addaction name="actionTables"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -524,6 +676,11 @@ QListWidget::item {
   <action name="actionDashboard">
    <property name="text">
     <string>Dashboard</string>
+   </property>
+  </action>
+  <action name="actionTables">
+   <property name="text">
+    <string>Tables</string>
    </property>
   </action>
  </widget>

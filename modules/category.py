@@ -1,7 +1,8 @@
 import sqlite3
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QListWidgetItem, QWidget, QHBoxLayout, QPushButton, QTableWidgetItem, QHeaderView, QMessageBox
+from PyQt5.QtWidgets import QDialog, QListWidgetItem, QWidget, QHBoxLayout, QPushButton, QTableWidgetItem, QHeaderView, \
+QMessageBox
 from PyQt5.QtGui import QIcon
 from PyQt5 import uic
 
