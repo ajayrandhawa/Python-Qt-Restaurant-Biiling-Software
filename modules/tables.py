@@ -1,5 +1,5 @@
 import sqlite3
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QDialog, QListWidgetItem, QWidget, QHBoxLayout, QPushButton, QTableWidgetItem, QHeaderView, \
     QMessageBox
 from PyQt5.QtGui import QIcon
@@ -62,7 +62,10 @@ class Tables:
         for table_name in tables:
             item_text = f"{table_name[1]}"
             item = QListWidgetItem()
+            icon = QIcon("icon/table.png")  # Replace with your icon file
+            item.setIcon(icon)
             item.setText(item_text)
+            self.table_list_widget.setIconSize(QSize(64, 64))
             self.table_list_widget.addItem(item)
 
     def loadTableTable(self):

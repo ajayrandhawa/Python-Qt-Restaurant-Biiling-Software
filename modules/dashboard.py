@@ -49,3 +49,5 @@ class Dashboard(QMainWindow):
 
     def show_tables_section(self):
         self.uimanager.setCurrentIndex(3)
+        self.table_manager.loadTableList()
+        self.table_manager.loadTableTable()
