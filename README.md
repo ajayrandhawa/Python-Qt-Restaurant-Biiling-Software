@@ -13,3 +13,5 @@ Open-source restaurant management software built with Python and Qt, designed to
 - **Orders**: Create and track orders in real-time to improve service efficiency.
 - **Table Management**: Organize table seating and status to streamline reservations and service.
 - **Reports**: Generate comprehensive reports on sales, order history, and more for insightful analysis.
+
+Under Development ;)
