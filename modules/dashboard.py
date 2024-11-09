@@ -31,6 +31,7 @@ class Dashboard(QMainWindow):
         self.actionItems.triggered.connect(self.show_items_section)
         self.actionDashboard.triggered.connect(self.show_dashboard_section)
         self.actionTables.triggered.connect(self.show_tables_section)
+        self.actionToolbar.triggered.connect(self.toggleToolbar)
 
 
     def show_dashboard_section(self):
@@ -51,3 +52,6 @@ class Dashboard(QMainWindow):
         self.uimanager.setCurrentIndex(3)
         self.table_manager.loadTableList()
         self.table_manager.loadTableTable()
+
+    def toggleToolbar(self):
+        self.toolbar.setVisible(not self.toolbar.isVisible())
