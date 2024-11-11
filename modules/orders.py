@@ -9,53 +9,29 @@ from PyQt5 import uic
 from PyQt5.uic.properties import QtGui
 
 
-class Items:
+class Orders:
     def __init__(self):
         # Placeholder for UI elements
-        self.items_name_input = None
-        self.items_category_combo = None
-        self.items_price_input = None
-        self.items_description_input = None
-        self.items_mtype_combo = None
-        self.items_table_widget = None
-        self.items_list_widget = None
-        self.items_page_search_input = None
-        self.items_page_search_btn = None
-        self.items_page_category_combo_filter = None
-        self.updateDialog = None
-        self.item_id_to_update = None
+        self.orders_table_widget = None
+        self.orders_list_widget = None
 
-
-    def set_ui_elements(self, items_name_input, items_category_combo, items_price_input, items_description_input, items_mtype_combo, items_table_widget, items_list_widget, items_page_search_input, items_page_search_btn, items_page_category_combo_filter):
+    def set_ui_elements(self, orders_table_widget, orders_list_widget):
         """Set UI elements so we can interact with them from this class."""
-        self.items_name_input = items_name_input
-        self.items_category_combo = items_category_combo
-        self.items_price_input = items_price_input
-        self.items_description_input = items_description_input
-        self.items_mtype_combo = items_mtype_combo
-        self.items_table_widget = items_table_widget
-        self.items_list_widget = items_list_widget
-
-        self.items_page_search_input = items_page_search_input
-        self.items_page_search_btn = items_page_search_btn
-        self.items_page_category_combo_filter = items_page_category_combo_filter
-
-        self.items_page_category_combo_filter.currentTextChanged.connect(self.filter_items)
-
-
+        self.orders_table_widget = orders_table_widget
+        self.orders_list_widget = orders_list_widget
 
     def createItem(self):
         """Save the item to the database."""
-        item_name = self.items_name_input.text() if self.items_name_input else ""
-        category = self.items_category_combo.currentText() if self.items_category_combo else ""
-        item_description = self.items_description_input.text() if self.items_description_input else ""
-        item_price = self.items_price_input.text() if self.items_price_input else ""
-        mtype = self.items_mtype_combo.currentText() if self.items_mtype_combo.currentText() else "Veg"
+        item_name = self.orders_name_input.text() if self.orders_name_input else ""
+        category = self.orders_category_combo.currentText() if self.orders_category_combo else ""
+        item_description = self.orders_description_input.text() if self.orders_description_input else ""
+        item_price = self.orders_price_input.text() if self.orders_price_input else ""
+        mtype = self.orders_mtype_combo.currentText() if self.orders_mtype_combo.currentText() else "Veg"
 
         if item_name:
             connection = sqlite3.connect("db/database.db")
             cursor = connection.cursor()
-            cursor.execute('''CREATE TABLE IF NOT EXISTS items (
+            cursor.execute('''CREATE TABLE IF NOT EXISTS orders (
                                 item_id INTEGER PRIMARY KEY AUTOINCREMENT,
                                 item_name TEXT UNIQUE NOT NULL,
                                 category TEXT NOT NULL,
@@ -67,12 +43,12 @@ class Items:
 
             try:
                 cursor.execute(
-                    "INSERT INTO items (item_name, category, item_description, item_price, mtype) "
+                    "INSERT INTO orders (item_name, category, item_description, item_price, mtype) "
                     "VALUES (?, ?, ?, ?, ?)",
                     (item_name, category, item_description, item_price, mtype))
                 connection.commit()
                 self.loadItemTable()
-                self.loadItemsList()
+                self.loadordersList()
             except sqlite3.IntegrityError:
                 print("Item already exists.")
             finally:
@@ -80,20 +56,20 @@ class Items:
         else:
             print("Item name is empty.")
 
-    def fetch_items(self):
+    def fetch_orders(self):
         connection = sqlite3.connect("db/database.db")
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM items")
-        items = cursor.fetchall()
+        cursor.execute("SELECT * FROM orders")
+        orders = cursor.fetchall()
         connection.close()
-        return items
+        return orders
 
-    def loadItemsList(self):
+    def loadordersList(self):
 
-        self.items_list_widget.clear()
-        items = self.fetch_items()
+        self.orders_list_widget.clear()
+        orders = self.fetch_orders()
 
-        for index, (item_id, item_name, item_category, _, _, mtype) in enumerate(items):
+        for index, (item_id, item_name, item_category, _, _, mtype) in enumerate(orders):
             item_widget = QWidget()
             item_layout = QVBoxLayout()
 
@@ -120,34 +96,34 @@ class Items:
             list_item = QListWidgetItem()
             list_item.setSizeHint(item_widget.sizeHint())
 
-            self.items_list_widget.addItem(list_item)
-            self.items_list_widget.setItemWidget(list_item, item_widget)
+            self.orders_list_widget.addItem(list_item)
+            self.orders_list_widget.setItemWidget(list_item, item_widget)
 
     def loadItemTable(self):
-        items = self.fetch_items()
+        orders = self.fetch_orders()
 
-        self.items_table_widget.clearContents()
-        self.items_table_widget.setAlternatingRowColors(True)
-        self.items_table_widget.setColumnCount(6)
-        self.items_table_widget.setHorizontalHeaderLabels(("#", "Name", "Category", "Price", "V/N", "Action"))
+        self.orders_table_widget.clearContents()
+        self.orders_table_widget.setAlternatingRowColors(True)
+        self.orders_table_widget.setColumnCount(6)
+        self.orders_table_widget.setHorizontalHeaderLabels(("#", "Order ID", "Table", "Qty", "Amount", "Action"))
 
         # Column setup
-        self.items_table_widget.setColumnWidth(0, 5)
-        self.items_table_widget.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
-        self.items_table_widget.verticalHeader().setVisible(False)
-        self.items_table_widget.horizontalHeader().setDefaultAlignment(Qt.AlignLeft)
+        self.orders_table_widget.setColumnWidth(0, 5)
+        self.orders_table_widget.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.orders_table_widget.verticalHeader().setVisible(False)
+        self.orders_table_widget.horizontalHeader().setDefaultAlignment(Qt.AlignLeft)
 
-        self.items_table_widget.setRowCount(0)
+        self.orders_table_widget.setRowCount(0)
 
-        for inx, item in enumerate(items):
+        for inx, item in enumerate(orders):
             cell_widget = QWidget()
             layout = QHBoxLayout(cell_widget)
 
-            editBtn = QPushButton(self.items_table_widget)
+            editBtn = QPushButton(self.orders_table_widget)
             editBtn.setIcon(QIcon("icon/edit.png"))
             editBtn.setFixedWidth(30)
 
-            deleteBtn = QPushButton(self.items_table_widget)
+            deleteBtn = QPushButton(self.orders_table_widget)
             deleteBtn.setIcon(QIcon("icon/delete.png"))
             deleteBtn.setFixedWidth(30)
 
@@ -159,13 +135,13 @@ class Items:
             layout.addWidget(deleteBtn)
             layout.setContentsMargins(0, 0, 0, 0)
             cell_widget.setLayout(layout)
-            self.items_table_widget.insertRow(inx)
-            self.items_table_widget.setItem(inx, 0, QTableWidgetItem(str(item[0])))
-            self.items_table_widget.setItem(inx, 1, QTableWidgetItem(item[1]))
-            self.items_table_widget.setItem(inx, 2, QTableWidgetItem(item[2]))
-            self.items_table_widget.setItem(inx, 3, QTableWidgetItem(str(item[3])))
-            self.items_table_widget.setItem(inx, 4, QTableWidgetItem(str(item[5])))
-            self.items_table_widget.setCellWidget(inx, 5, cell_widget)
+            self.orders_table_widget.insertRow(inx)
+            self.orders_table_widget.setItem(inx, 0, QTableWidgetItem(str(item[0])))
+            self.orders_table_widget.setItem(inx, 1, QTableWidgetItem(item[1]))
+            self.orders_table_widget.setItem(inx, 2, QTableWidgetItem(item[2]))
+            self.orders_table_widget.setItem(inx, 3, QTableWidgetItem(str(item[3])))
+            self.orders_table_widget.setItem(inx, 4, QTableWidgetItem(str(item[5])))
+            self.orders_table_widget.setCellWidget(inx, 5, cell_widget)
 
     def showUpdateDialog(self, item_id):
         self.item_id_to_update = item_id
@@ -173,10 +149,10 @@ class Items:
         uic.loadUi('ui/item_update.ui', self.updateDialog)  # Load the update UI
 
         item = self.getItemDetails(item_id)
-        self.updateDialog.items_update_name_input.setText(item[1])
-        self.updateDialog.items_update_price_input.setText(str(item[3]))
-        self.updateDialog.items_update_description_input.setText(item[4])
-        self.updateDialog.items_update_mtype_combo.setCurrentText(item[5])
+        self.updateDialog.orders_update_name_input.setText(item[1])
+        self.updateDialog.orders_update_price_input.setText(str(item[3]))
+        self.updateDialog.orders_update_description_input.setText(item[4])
+        self.updateDialog.orders_update_mtype_combo.setCurrentText(item[5])
         self.updateDialog.item_update_btn.clicked.connect(self.updateItem)
         self.load_categories_in_item_update(item[2])
         self.updateDialog.exec_()
@@ -184,24 +160,24 @@ class Items:
     def getItemDetails(self, item_id):
         connection = sqlite3.connect("db/database.db")
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM items WHERE item_id = ?", (item_id,))
+        cursor.execute("SELECT * FROM orders WHERE item_id = ?", (item_id,))
         item = cursor.fetchone()
         connection.close()
         return item
 
     def updateItem(self):
         """Update the item details in the database."""
-        item_name = self.updateDialog.items_update_name_input.text()
-        category = self.updateDialog.items_update_category_combo.currentText()
-        item_description = self.updateDialog.items_update_description_input.text()
-        item_price = self.updateDialog.items_update_price_input.text()
-        mtype = self.updateDialog.items_update_mtype_combo.currentText()
+        item_name = self.updateDialog.orders_update_name_input.text()
+        category = self.updateDialog.orders_update_category_combo.currentText()
+        item_description = self.updateDialog.orders_update_description_input.text()
+        item_price = self.updateDialog.orders_update_price_input.text()
+        mtype = self.updateDialog.orders_update_mtype_combo.currentText()
 
         if item_name:
             connection = sqlite3.connect("db/database.db")
             cursor = connection.cursor()
             cursor.execute(
-                "UPDATE items SET item_name = ?, category = ?, item_description = ?, item_price = ?, mtype = ? WHERE item_id = ?",
+                "UPDATE orders SET item_name = ?, category = ?, item_description = ?, item_price = ?, mtype = ? WHERE item_id = ?",
                 (item_name, category, item_description, item_price, mtype, self.item_id_to_update))
             connection.commit()
             connection.close()
@@ -216,7 +192,7 @@ class Items:
     def deleteItem(self, item_id):
         connection = sqlite3.connect("db/database.db")
         cursor = connection.cursor()
-        cursor.execute("DELETE FROM items WHERE item_id = ?", (item_id,))
+        cursor.execute("DELETE FROM orders WHERE item_id = ?", (item_id,))
         connection.commit()
         connection.close()
         print(f"Item with ID {item_id} deleted.")
@@ -233,7 +209,7 @@ class Items:
         if reply == QMessageBox.Yes:
             self.deleteItem(item_id)
             self.loadItemTable()
-            self.loadItemsList()
+            self.loadordersList()
 
     def fetch_all_categories(self):
         connection = sqlite3.connect("db/database.db")
@@ -245,24 +221,16 @@ class Items:
 
     def load_categories_in_combo(self):
         categories = self.fetch_all_categories()
-        self.items_category_combo.clear()
-        self.items_page_category_combo_filter.addItem('All')
+        self.orders_category_combo.clear()
         for category in categories:
-            self.items_category_combo.addItem(category[1], category[0])
-            self.items_page_category_combo_filter.addItem(category[1], category[0])
+            self.orders_category_combo.addItem(category[1], category[0])
 
     def load_categories_in_item_update(self, selected_category_name):
         categories = self.fetch_all_categories()
-        self.updateDialog.items_update_category_combo.clear()
+        self.updateDialog.orders_update_category_combo.clear()
         for category in categories:
-            self.updateDialog.items_update_category_combo.addItem(category[1])
+            self.updateDialog.orders_update_category_combo.addItem(category[1])
 
-        index = self.updateDialog.items_update_category_combo.findText(selected_category_name)
+        index = self.updateDialog.orders_update_category_combo.findText(selected_category_name)
         if index != -1:
-            self.updateDialog.items_update_category_combo.setCurrentIndex(index)
-
-    def filter_items(self):
-        """Filter items in items_list_widget based on selected category."""
-        selected_category = self.items_page_category_combo_filter.currentText()
-
-        print(selected_category)
+            self.updateDialog.orders_update_category_combo.setCurrentIndex(index)

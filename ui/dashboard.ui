@@ -34,7 +34,7 @@
     <item>
      <widget class="QStackedWidget" name="uimanager">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="dashboardpage">
        <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -67,10 +67,10 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="6,4">
             <item>
-             <widget class="QListWidget" name="listWidget"/>
+             <widget class="QListWidget" name="orders_list_widget"/>
             </item>
             <item>
-             <widget class="QTableWidget" name="tableWidget"/>
+             <widget class="QTableWidget" name="orders_table_widget"/>
             </item>
            </layout>
           </item>
@@ -250,19 +250,50 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_6">
                 <item>
-                 <widget class="QLineEdit" name="lineEdit"/>
+                 <widget class="QLineEdit" name="items_page_search_input">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QLineEdit{
+	padding-left: 10px
+}</string>
+                  </property>
+                  <property name="cursorPosition">
+                   <number>0</number>
+                  </property>
+                  <property name="placeholderText">
+                   <string>Search ......</string>
+                  </property>
+                 </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton">
+                 <widget class="QPushButton" name="items_page_search_btn">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
                   <property name="text">
-                   <string>PushButton</string>
+                   <string>Search</string>
                   </property>
                  </widget>
                 </item>
                </layout>
               </item>
               <item>
-               <widget class="QComboBox" name="comboBox"/>
+               <widget class="QComboBox" name="items_page_category_combo_filter">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>35</height>
+                 </size>
+                </property>
+               </widget>
               </item>
               <item>
                <widget class="QListWidget" name="items_list_widget">
