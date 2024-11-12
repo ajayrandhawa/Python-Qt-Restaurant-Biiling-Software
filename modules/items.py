@@ -41,7 +41,7 @@ class Items:
         self.items_page_category_combo_filter = items_page_category_combo_filter
 
         self.items_page_category_combo_filter.currentTextChanged.connect(self.filter_items)
-
+        self.items_page_search_btn.clicked.connect(self.performSearch)
 
 
     def createItem(self):
@@ -80,29 +80,49 @@ class Items:
         else:
             print("Item name is empty.")
 
-    def fetch_items(self, category_filter=None):
+    def fetch_items(self, category_filter=None, search_term=None):
+        """Fetch items from the database with different queries based on category and search filters."""
         connection = sqlite3.connect("db/database.db")
         cursor = connection.cursor()
-        if category_filter:
-            cursor.execute("SELECT * FROM items WHERE category = ?", (category_filter,))
+
+        # Three distinct queries based on the filter combinations
+        if category_filter and search_term:
+            # Both category and search term filters
+            query = "SELECT * FROM items WHERE category = ? AND item_name LIKE ?"
+            params = [category_filter, f"%{search_term}%"]
+        elif category_filter:
+            # Only category filter
+            query = "SELECT * FROM items WHERE category = ?"
+            params = [category_filter]
+        elif search_term:
+            # Only search term filter
+            query = "SELECT * FROM items WHERE item_name LIKE ?"
+            params = [f"%{search_term}%"]
         else:
-            cursor.execute("SELECT * FROM items")
+            # No filters, fetch all items
+            query = "SELECT * FROM items"
+            params = []
+
+        cursor.execute(query, params)
         items = cursor.fetchall()
         connection.close()
         return items
 
-    def loadItemsList(self, category_filter=None):
+    def loadItemsList(self, category_filter=None, search_term=None):
+        """Load items into the list widget with optional category and search filtering."""
         self.items_list_widget.clear()
-
-        items = self.fetch_items(category_filter=category_filter)
+        items = self.fetch_items(category_filter=category_filter, search_term=search_term)
 
         for index, (item_id, item_name, item_category, _, _, mtype) in enumerate(items):
+            # Create item widget as before
             item_widget = QWidget()
             item_layout = QVBoxLayout()
 
+            # Set background color and labels as before
             background_color = "#D4F7C5" if mtype == "Veg" else "#FFD1D1"
             item_widget.setStyleSheet(f"background-color: {background_color}; border-radius: 10px;")
 
+            # Set item name label
             text_up_label = QLabel(item_name)
             text_up_label.setStyleSheet("font-size: 16px; color: #333; font-weight: bold;")
             text_up_label.setAlignment(Qt.AlignTop)
@@ -111,6 +131,7 @@ class Items:
             text_up_label.setFixedHeight(150)
             text_up_label.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
 
+            # Set item category label
             text_down_label = QLabel(item_category)
             text_down_label.setStyleSheet("font-size: 12px; color: #666;")
             text_down_label.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
@@ -125,23 +146,19 @@ class Items:
             self.items_list_widget.addItem(list_item)
             self.items_list_widget.setItemWidget(list_item, item_widget)
 
-    def loadItemTable(self, category_filter=None):
-        items = self.fetch_items(category_filter=category_filter)
-
+    def loadItemTable(self, category_filter=None, search_term=None):
+        """Load items into the table widget with optional category and search filtering."""
         self.items_table_widget.clearContents()
         self.items_table_widget.setAlternatingRowColors(True)
         self.items_table_widget.setColumnCount(6)
         self.items_table_widget.setHorizontalHeaderLabels(("#", "Name", "Category", "Price", "V/N", "Action"))
 
-        # Column setup
-        self.items_table_widget.setColumnWidth(0, 5)
-        self.items_table_widget.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
-        self.items_table_widget.verticalHeader().setVisible(False)
-        self.items_table_widget.horizontalHeader().setDefaultAlignment(Qt.AlignLeft)
-
         self.items_table_widget.setRowCount(0)
 
+        items = self.fetch_items(category_filter=category_filter, search_term=search_term)
+
         for index, (item_id, item_name, item_category, item_price, item_description, item_mtype) in enumerate(items):
+            # Create table rows as before
             cell_widget = QWidget()
             layout = QHBoxLayout(cell_widget)
 
@@ -153,7 +170,6 @@ class Items:
             deleteBtn.setIcon(QIcon("icon/delete.png"))
             deleteBtn.setFixedWidth(30)
 
-            # Connect buttons to handlers with item ID
             editBtn.clicked.connect(lambda checked, item_id=item_id: self.showUpdateDialog(item_id))
             deleteBtn.clicked.connect(lambda checked, item_id=item_id: self.handleDelete(item_id))
 
@@ -161,6 +177,47 @@ class Items:
             layout.addWidget(deleteBtn)
             layout.setContentsMargins(0, 0, 0, 0)
             cell_widget.setLayout(layout)
+
+            self.items_table_widget.insertRow(index)
+            self.items_table_widget.setItem(index, 0, QTableWidgetItem(str(item_id)))
+            self.items_table_widget.setItem(index, 1, QTableWidgetItem(item_name))
+            self.items_table_widget.setItem(index, 2, QTableWidgetItem(item_category))
+            self.items_table_widget.setItem(index, 3, QTableWidgetItem(str(item_price)))
+            self.items_table_widget.setItem(index, 4, QTableWidgetItem(str(item_mtype)))
+            self.items_table_widget.setCellWidget(index, 5, cell_widget)
+
+    def loadItemTable(self, category_filter=None, search_term=None):
+        """Load items into the table widget with optional category and search filtering."""
+        self.items_table_widget.clearContents()
+        self.items_table_widget.setAlternatingRowColors(True)
+        self.items_table_widget.setColumnCount(6)
+        self.items_table_widget.setHorizontalHeaderLabels(("#", "Name", "Category", "Price", "V/N", "Action"))
+
+        self.items_table_widget.setRowCount(0)
+
+        items = self.fetch_items(category_filter=category_filter, search_term=search_term)
+
+        for index, (item_id, item_name, item_category, item_price, item_description, item_mtype) in enumerate(items):
+            # Create table rows as before
+            cell_widget = QWidget()
+            layout = QHBoxLayout(cell_widget)
+
+            editBtn = QPushButton(self.items_table_widget)
+            editBtn.setIcon(QIcon("icon/edit.png"))
+            editBtn.setFixedWidth(30)
+
+            deleteBtn = QPushButton(self.items_table_widget)
+            deleteBtn.setIcon(QIcon("icon/delete.png"))
+            deleteBtn.setFixedWidth(30)
+
+            editBtn.clicked.connect(lambda checked, item_id=item_id: self.showUpdateDialog(item_id))
+            deleteBtn.clicked.connect(lambda checked, item_id=item_id: self.handleDelete(item_id))
+
+            layout.addWidget(editBtn)
+            layout.addWidget(deleteBtn)
+            layout.setContentsMargins(0, 0, 0, 0)
+            cell_widget.setLayout(layout)
+
             self.items_table_widget.insertRow(index)
             self.items_table_widget.setItem(index, 0, QTableWidgetItem(str(item_id)))
             self.items_table_widget.setItem(index, 1, QTableWidgetItem(item_name))
@@ -272,3 +329,14 @@ class Items:
             selected_category = None
         self.loadItemTable(category_filter=selected_category)
         self.loadItemsList(category_filter=selected_category)
+
+    def performSearch(self):
+        search_term = self.items_page_search_input.text()
+        category_filter = self.items_page_category_combo_filter.currentText()
+
+        if category_filter == 'All':
+            category_filter = None
+
+        # Load filtered items into list and table widgets
+        self.loadItemsList(category_filter=category_filter, search_term=search_term)
+        self.loadItemTable(category_filter=category_filter, search_term=search_term)
