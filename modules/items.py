@@ -80,18 +80,21 @@ class Items:
         else:
             print("Item name is empty.")
 
-    def fetch_items(self):
+    def fetch_items(self, category_filter=None):
         connection = sqlite3.connect("db/database.db")
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM items")
+        if category_filter:
+            cursor.execute("SELECT * FROM items WHERE category = ?", (category_filter,))
+        else:
+            cursor.execute("SELECT * FROM items")
         items = cursor.fetchall()
         connection.close()
         return items
 
-    def loadItemsList(self):
-
+    def loadItemsList(self, category_filter=None):
         self.items_list_widget.clear()
-        items = self.fetch_items()
+
+        items = self.fetch_items(category_filter=category_filter)
 
         for index, (item_id, item_name, item_category, _, _, mtype) in enumerate(items):
             item_widget = QWidget()
@@ -119,12 +122,11 @@ class Items:
 
             list_item = QListWidgetItem()
             list_item.setSizeHint(item_widget.sizeHint())
-
             self.items_list_widget.addItem(list_item)
             self.items_list_widget.setItemWidget(list_item, item_widget)
 
-    def loadItemTable(self):
-        items = self.fetch_items()
+    def loadItemTable(self, category_filter=None):
+        items = self.fetch_items(category_filter=category_filter)
 
         self.items_table_widget.clearContents()
         self.items_table_widget.setAlternatingRowColors(True)
@@ -139,7 +141,7 @@ class Items:
 
         self.items_table_widget.setRowCount(0)
 
-        for inx, item in enumerate(items):
+        for index, (item_id, item_name, item_category, item_price, item_description, item_mtype) in enumerate(items):
             cell_widget = QWidget()
             layout = QHBoxLayout(cell_widget)
 
@@ -152,20 +154,20 @@ class Items:
             deleteBtn.setFixedWidth(30)
 
             # Connect buttons to handlers with item ID
-            editBtn.clicked.connect(lambda checked, item_id=item[0]: self.showUpdateDialog(item_id))
-            deleteBtn.clicked.connect(lambda checked, item_id=item[0]: self.handleDelete(item_id))
+            editBtn.clicked.connect(lambda checked, item_id=item_id: self.showUpdateDialog(item_id))
+            deleteBtn.clicked.connect(lambda checked, item_id=item_id: self.handleDelete(item_id))
 
             layout.addWidget(editBtn)
             layout.addWidget(deleteBtn)
             layout.setContentsMargins(0, 0, 0, 0)
             cell_widget.setLayout(layout)
-            self.items_table_widget.insertRow(inx)
-            self.items_table_widget.setItem(inx, 0, QTableWidgetItem(str(item[0])))
-            self.items_table_widget.setItem(inx, 1, QTableWidgetItem(item[1]))
-            self.items_table_widget.setItem(inx, 2, QTableWidgetItem(item[2]))
-            self.items_table_widget.setItem(inx, 3, QTableWidgetItem(str(item[3])))
-            self.items_table_widget.setItem(inx, 4, QTableWidgetItem(str(item[5])))
-            self.items_table_widget.setCellWidget(inx, 5, cell_widget)
+            self.items_table_widget.insertRow(index)
+            self.items_table_widget.setItem(index, 0, QTableWidgetItem(str(item_id)))
+            self.items_table_widget.setItem(index, 1, QTableWidgetItem(item_name))
+            self.items_table_widget.setItem(index, 2, QTableWidgetItem(item_category))
+            self.items_table_widget.setItem(index, 3, QTableWidgetItem(str(item_price)))
+            self.items_table_widget.setItem(index, 4, QTableWidgetItem(str(item_mtype)))
+            self.items_table_widget.setCellWidget(index, 5, cell_widget)
 
     def showUpdateDialog(self, item_id):
         self.item_id_to_update = item_id
@@ -247,22 +249,26 @@ class Items:
         categories = self.fetch_all_categories()
         self.items_category_combo.clear()
         self.items_page_category_combo_filter.addItem('All')
-        for category in categories:
-            self.items_category_combo.addItem(category[1], category[0])
-            self.items_page_category_combo_filter.addItem(category[1], category[0])
+
+        for category_id, category_name in categories:
+            self.items_category_combo.addItem(category_name, category_id)
+            self.items_page_category_combo_filter.addItem(category_name, category_id)
+
 
     def load_categories_in_item_update(self, selected_category_name):
         categories = self.fetch_all_categories()
         self.updateDialog.items_update_category_combo.clear()
-        for category in categories:
-            self.updateDialog.items_update_category_combo.addItem(category[1])
+
+        for category_id, category_name in categories:
+            self.updateDialog.items_update_category_combo.addItem(category_name)
 
         index = self.updateDialog.items_update_category_combo.findText(selected_category_name)
         if index != -1:
             self.updateDialog.items_update_category_combo.setCurrentIndex(index)
 
     def filter_items(self):
-        """Filter items in items_list_widget based on selected category."""
         selected_category = self.items_page_category_combo_filter.currentText()
-
-        print(selected_category)
+        if selected_category == "All":
+            selected_category = None
+        self.loadItemTable(category_filter=selected_category)
+        self.loadItemsList(category_filter=selected_category)
