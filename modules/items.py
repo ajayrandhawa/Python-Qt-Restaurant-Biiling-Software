@@ -150,8 +150,8 @@ class Items:
         """Load items into the table widget with optional category and search filtering."""
         self.items_table_widget.clearContents()
         self.items_table_widget.setAlternatingRowColors(True)
-        self.items_table_widget.setColumnCount(6)
-        self.items_table_widget.setHorizontalHeaderLabels(("#", "Name", "Category", "Price", "V/N", "Action"))
+        self.items_table_widget.setColumnCount(5)
+        self.items_table_widget.setHorizontalHeaderLabels(("Name", "Category", "Price", "V/N", "Action"))
 
         self.items_table_widget.setRowCount(0)
 
@@ -179,52 +179,11 @@ class Items:
             cell_widget.setLayout(layout)
 
             self.items_table_widget.insertRow(index)
-            self.items_table_widget.setItem(index, 0, QTableWidgetItem(str(item_id)))
-            self.items_table_widget.setItem(index, 1, QTableWidgetItem(item_name))
-            self.items_table_widget.setItem(index, 2, QTableWidgetItem(item_category))
-            self.items_table_widget.setItem(index, 3, QTableWidgetItem(str(item_price)))
-            self.items_table_widget.setItem(index, 4, QTableWidgetItem(str(item_mtype)))
-            self.items_table_widget.setCellWidget(index, 5, cell_widget)
-
-    def loadItemTable(self, category_filter=None, search_term=None):
-        """Load items into the table widget with optional category and search filtering."""
-        self.items_table_widget.clearContents()
-        self.items_table_widget.setAlternatingRowColors(True)
-        self.items_table_widget.setColumnCount(6)
-        self.items_table_widget.setHorizontalHeaderLabels(("#", "Name", "Category", "Price", "V/N", "Action"))
-
-        self.items_table_widget.setRowCount(0)
-
-        items = self.fetch_items(category_filter=category_filter, search_term=search_term)
-
-        for index, (item_id, item_name, item_category, item_price, item_description, item_mtype) in enumerate(items):
-            # Create table rows as before
-            cell_widget = QWidget()
-            layout = QHBoxLayout(cell_widget)
-
-            editBtn = QPushButton(self.items_table_widget)
-            editBtn.setIcon(QIcon("icon/edit.png"))
-            editBtn.setFixedWidth(30)
-
-            deleteBtn = QPushButton(self.items_table_widget)
-            deleteBtn.setIcon(QIcon("icon/delete.png"))
-            deleteBtn.setFixedWidth(30)
-
-            editBtn.clicked.connect(lambda checked, item_id=item_id: self.showUpdateDialog(item_id))
-            deleteBtn.clicked.connect(lambda checked, item_id=item_id: self.handleDelete(item_id))
-
-            layout.addWidget(editBtn)
-            layout.addWidget(deleteBtn)
-            layout.setContentsMargins(0, 0, 0, 0)
-            cell_widget.setLayout(layout)
-
-            self.items_table_widget.insertRow(index)
-            self.items_table_widget.setItem(index, 0, QTableWidgetItem(str(item_id)))
-            self.items_table_widget.setItem(index, 1, QTableWidgetItem(item_name))
-            self.items_table_widget.setItem(index, 2, QTableWidgetItem(item_category))
-            self.items_table_widget.setItem(index, 3, QTableWidgetItem(str(item_price)))
-            self.items_table_widget.setItem(index, 4, QTableWidgetItem(str(item_mtype)))
-            self.items_table_widget.setCellWidget(index, 5, cell_widget)
+            self.items_table_widget.setItem(index, 0, QTableWidgetItem(item_name))
+            self.items_table_widget.setItem(index, 1, QTableWidgetItem(item_category))
+            self.items_table_widget.setItem(index, 2, QTableWidgetItem(str(item_price)))
+            self.items_table_widget.setItem(index, 3, QTableWidgetItem(str(item_mtype)))
+            self.items_table_widget.setCellWidget(index, 4, cell_widget)
 
     def showUpdateDialog(self, item_id):
         self.item_id_to_update = item_id

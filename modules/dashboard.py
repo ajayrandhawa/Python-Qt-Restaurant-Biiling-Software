@@ -23,7 +23,6 @@ class Dashboard(QMainWindow):
         self.category_manager.set_ui_elements(self.category_name_input, self.category_list_widget, self.category_table_widget)
         self.items_manager.set_ui_elements(self.items_name_input, self.items_category_combo, self.items_price_input, self.items_description_input, self.items_mtype_combo, self.items_table_widget, self.items_list_widget, self.items_page_search_input, self.items_page_search_btn, self.items_page_category_combo_filter)
         self.table_manager.set_ui_elements(self.table_name_input, self.table_list_widget, self.table_table_widget)
-        self.orders_manager.set_ui_elements(self.orders_list_widget, self.orders_table_widget)
 
         # Connect add_category_btn to the saveCategory method in Category
         self.add_category_btn.clicked.connect(self.category_manager.saveCategory)
