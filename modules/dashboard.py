@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5 import uic
 
 from modules.category import Category
+from modules.create_order import CreateOrder
 from modules.items import Items
 from modules.orders import Orders
 from modules.tables import Tables
@@ -18,6 +19,7 @@ class Dashboard(QMainWindow):
         self.items_manager = Items()
         self.table_manager = Tables()
         self.orders_manager = Orders()
+        self.create_order = CreateOrder()
 
         # Set UI elements for the Category instance
         self.category_manager.set_ui_elements(self.category_name_input, self.category_list_widget, self.category_table_widget)
@@ -33,6 +35,7 @@ class Dashboard(QMainWindow):
         self.actionItems.triggered.connect(self.show_items_section)
         self.actionDashboard.triggered.connect(self.show_dashboard_section)
         self.actionTables.triggered.connect(self.show_tables_section)
+        self.actionCreate_Order.triggered.connect(self.show_create_order)
         self.actionToolbar.triggered.connect(self.toggleToolbar)
 
 
@@ -57,3 +60,6 @@ class Dashboard(QMainWindow):
 
     def toggleToolbar(self):
         self.toolbar.setVisible(not self.toolbar.isVisible())
+
+    def show_create_order(self):
+        self.create_order.showDialog()
