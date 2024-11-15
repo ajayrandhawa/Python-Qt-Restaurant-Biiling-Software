@@ -4,8 +4,6 @@
 
 Python Qt Restaurant Billing Softwaree built with Python and Qt, designed to streamline restaurant operations. This application provides a complete suite of features, including Category Management, Item Management, Orders, Tables, and Reports.
 
-<img src="screenshot/products-7-11-2024.png" />
-
 ## Key Features
 
 - **Category Management**: Manage food and beverage categories for easy organization.
